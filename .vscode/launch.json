@@ -10,6 +10,14 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
+        }
+
+        {
+            "name": "Python: test.py",
+            "type": "python",
+            "request": "launch",
+            "program": "./test.py",
+            "console": "integratedTerminal",
             "args": [
                 "--dir", "/home/chill/20254_2_0_NPY/",
                 "--model_name", "OCMR",
