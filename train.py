@@ -69,6 +69,10 @@ device = torch.device(device)
 netG = Generator(6,232,256,outC=6)
 netD = Discriminator(6,232,256)
 
+if torch.cuda.device_count() > 1:
+    netG = nn.DataParallel(netG)
+    netD = nn.DataParallel(netD)
+
 netG = netG.to(device)
 netD = netD.to(device)
 
@@ -89,7 +93,7 @@ trainLossCnt = 0
 valLossCnt = 0
 
 for epoch in range(numEpochs):
-    print("#"*50)
+    print("\n","#"*50)
     print("Epoch {}".format(epoch))
     print("#"*50,"\n")
 
@@ -142,7 +146,7 @@ for epoch in range(numEpochs):
         loss_batch = errG_recon.item()
         runningLoss += loss_batch
 
-        sys.stdout.write("\r[{}/{}] Loss: T1, {:.5f}".format(ii*bSize,trainLen,runningLoss/(ii+1)))
+        sys.stdout.write("\r[{}/{}] Loss: {:.5f}".format(ii*bSize,trainLen,runningLoss/(ii+1)))
 
         writer.add_scalar('Loss/train',loss_batch,trainLossCnt)
 
@@ -175,7 +179,7 @@ for epoch in range(numEpochs):
 
             writer.add_scalar("Loss/val",loss_batch,valLossCnt)
 
-            sys.stdout.write("\r[{}/{}] Loss: T1, {:.5f}".format(ii*bSize,valLen,valLoss/(ii+1)))
+            sys.stdout.write("\r[{}/{}] Loss: {:.5f}".format(ii*bSize,valLen,valLoss/(ii+1)))
 
             valLossCnt += 1
 
@@ -183,8 +187,8 @@ for epoch in range(numEpochs):
 
         if epoch == 0:
             torch.save({"Epoch":epoch+1,
-            "Generator_state_dict":netG.state_dict(),
-            "Discriminator_state_dict":netD.state_dict(),
+            "Generator_state_dict":netG.module.state_dict(),
+            "Discriminator_state_dict":netD.module.state_dict(),
             "Generator_optimizer":optim_G.state_dict(),
             "Discriminator_optimizer":optim_D.state_dict(),
             "Val_loss":valLoss,
@@ -197,8 +201,8 @@ for epoch in range(numEpochs):
                 sys.stdout.write("\nvalLoss {} < {} lowestLoss. Saving!\n".format(valLoss,lowestLoss))
 
                 torch.save({"Epoch":epoch+1,
-                "Generator_state_dict":netG.state_dict(),
-                "Discriminator_state_dict":netD.state_dict(),
+                "Generator_state_dict":netG.module.state_dict(),
+                "Discriminator_state_dict":netD.module.state_dict(),
                 "Generator_optimizer":optim_G.state_dict(),
                 "Discriminator_optimizer":optim_D.state_dict(),
                 "Val_loss":valLoss,

@@ -20,6 +20,9 @@ class IDEAL_Dataset(Dataset):
 
     def __getitem__(self, index):
         inpData = np.load("{}{}".format(self.fileDir,self.dataSet[index]))
+        if inpData.shape != (6,232,256):
+            inpData = np.zeros((6,232,256),dtype=inpData.dtype)
+            print("\n Corrupt Data: {} \n".format(self.dataSet[index]))
         sample = inpData
 
         if self.transform:
