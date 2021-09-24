@@ -41,10 +41,11 @@ device = torch.device(device)
 modelDict = torch.load("./TrainingLogs/{}/model.pt".format(modelName),map_location="cpu")
 
 gDict = modelDict["Generator_state_dict"]
-keys = list(gDict.keys())
-for k in keys:
-    gDict[k[7:]] = gDict[k]
-    del gDict[k]
+
+# keys = list(gDict.keys())
+# for k in keys:
+#     gDict[k[7:]] = gDict[k]
+#     del gDict[k]
 
 netG = Generator(6,232,256,outC=6)
 netG.load_state_dict(gDict)
@@ -80,8 +81,8 @@ with torch.no_grad():
             mae = maeLoss(fake,inpData)
             mse = mseLoss(fake,inpData)
 
-            mae = mae.numpy()
-            mse = mse.numpy()
+            mae = mae.cpu().numpy()
+            mse = mse.cpu().numpy()
 
             maeErr[:,:,kn0,kn1] = np.mean(mae,axis=(2,3))
             mseErr[:,:,kn0,kn1] = np.mean(mse,axis=(2,3))
